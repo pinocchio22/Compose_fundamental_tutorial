@@ -2,6 +2,7 @@ package com.example.compose_fundamental_tutorial
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.CheckBox
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -56,7 +57,8 @@ class MainActivity : ComponentActivity() {
 //                    BoxContainer()
 //                    TextContainer()
 //                    ShapeContainer()
-                    ButtonsContainer()
+//                    ButtonsContainer()
+                    CheckBoxContainer()
                 }
             }
         }
@@ -462,6 +464,119 @@ fun Path.polygon(sides: Int, radius: Float, center: Offset) {
     close()
 }
 
+@Composable
+fun CheckBoxContainer() {
+    val checkedStatusForFirst = remember { mutableStateOf(false) }
+    val checkedStatusForSecond = remember { mutableStateOf(false) }
+    val checkedStatusForThird = remember { mutableStateOf(false) }
+//    val checkedStatusForFourth = remember { mutableStateOf(false) }
+
+    val checkedStatesArray = listOf(checkedStatusForFirst, checkedStatusForSecond, checkedStatusForThird)
+
+    val AllBoxChecked: (Boolean) -> Unit = { isAll ->
+        Log.d("TAG", "$isAll")
+        checkedStatesArray.forEach { it.value = isAll }
+    }
+
+    val checkedStatusForFourth: Boolean = checkedStatesArray.all { it.value }
+
+//    var checkedStatusForSecond by remember { mutableStateOf(false) }
+//    val (checkedStatusForThird, setCheckedStatusForThird) = remember { mutableStateOf(false) }
+//    val (checkedStatusForFourth, setCheckedStatusForFourth) = remember { mutableStateOf(false) }
+
+    Column(
+        Modifier
+            .background(Color.White)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        CheckBoxWithTitle("1번 확인", checkedStatusForFirst)
+        CheckBoxWithTitle("2번 확인", checkedStatusForSecond)
+        CheckBoxWithTitle("3번 확인", checkedStatusForThird)
+
+//        Checkbox(
+//            checked = checkedStatusForSecond,
+//            onCheckedChange = {
+//            Log.d("TAG", "$it")
+//            checkedStatusForSecond = it
+//        })
+//
+//        Checkbox(
+//            checked = checkedStatusForThird,
+//            onCheckedChange = {
+//            Log.d("TAG", "$it")
+//            setCheckedStatusForThird.invoke(it)
+//        })
+
+        Spacer(Modifier.height(10.dp))
+        CheckBoxAll("모두 확인?", checkedStatusForFourth, AllBoxChecked)
+//        Checkbox(
+//            enabled = true,
+//            checked = checkedStatusForFourth,
+//            colors = CheckboxDefaults.colors(
+//                checkedColor = Color.Yellow,
+//                uncheckedColor = Color.Red,
+//                checkmarkColor = Color.Blue,
+//                disabledColor = Color.Gray
+//            ),
+//            onCheckedChange = {
+//            Log.d("TAG", "$it")
+//            setCheckedStatusForFourth.invoke(it)
+//        })
+
+    }
+}
+
+@Composable
+fun CheckBoxWithTitle(title: String, state: MutableState<Boolean>) {
+    Row(
+        Modifier
+            .background(Color.White)
+            .padding(horizontal = 30.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Checkbox(
+            checked = state.value,
+            onCheckedChange = {
+                Log.d("TAG", "$it")
+                state.value = it
+            })
+        Text(text = title)
+    }
+}
+
+@Composable
+fun CheckBoxAll(title: String,
+                isChecked: Boolean,
+                allBoxChecked: (Boolean) -> Unit) {
+    Row(
+        Modifier
+            .background(Color.White)
+            .padding(horizontal = 30.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Checkbox(
+            checked = isChecked,
+            colors = CheckboxDefaults.colors(
+                checkedColor = Color.Yellow,
+                uncheckedColor = Color.Red,
+                checkmarkColor = Color.Blue,
+                disabledColor = Color.Gray
+            ),
+            onCheckedChange = {
+                Log.d("TAG", "$it")
+                allBoxChecked(it)
+            })
+        Text(text = title)
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
@@ -471,6 +586,7 @@ fun DefaultPreview() {
 //        BoxWithConstaraintContainer()
 //        TextContainer()
 //        ShapeContainer()
-        ButtonsContainer()
+//        ButtonsContainer()
+        CheckBoxContainer()
     }
 }
