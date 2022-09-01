@@ -8,18 +8,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +26,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.Font
@@ -512,6 +511,9 @@ fun CheckBoxContainer() {
 
         Spacer(Modifier.height(10.dp))
         CheckBoxAll("모두 확인?", checkedStatusForFourth, AllBoxChecked)
+        Spacer(Modifier.height(10.dp))
+        MyCustomCheckBox("커스텀 체크박스", false)
+        MyCustomCheckBox("커스텀 체크박스 리플", true)
 //        Checkbox(
 //            enabled = true,
 //            checked = checkedStatusForFourth,
@@ -574,6 +576,59 @@ fun CheckBoxAll(title: String,
                 allBoxChecked(it)
             })
         Text(text = title)
+    }
+}
+
+@Composable
+fun MyCustomCheckBox(title: String, withRipple: Boolean = false) {
+
+    var (isChecked, setisChecked) = remember { mutableStateOf(false) }
+
+    var togglePainter = if (isChecked) R.drawable.ic_checked else R.drawable.ic_unchecked
+
+    var checkedInfoString = if (isChecked) "체크 완료" else "체크 해제"
+
+    var rippleEffect = if (withRipple) {
+        rememberRipple(
+            radius = 30.dp,
+            bounded = false,
+            color = Color.Blue
+        )
+    } else null
+
+    Row(
+        Modifier
+            .background(Color.White)
+            .padding(horizontal = 30.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+            .size(60.dp)
+            .clickable(
+                indication = rippleEffect,
+                interactionSource = remember{ MutableInteractionSource() }
+            ) {
+                Log.d("TAG", "클릭이 되었습니다.")
+                setisChecked.invoke(!isChecked)
+            }) {
+            Image(
+                painter = painterResource(id = togglePainter),
+                contentDescription = null,
+
+            )
+        }
+
+//        Checkbox(
+//            checked = isChecked,
+//            onCheckedChange = {
+//                Log.d("TAG", "$it")
+//                setisChecked.invoke(it)
+//            })
+        Text(text = "$title / $checkedInfoString")
     }
 }
 
