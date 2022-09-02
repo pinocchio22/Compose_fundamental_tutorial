@@ -16,7 +16,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,6 +37,10 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -59,10 +68,84 @@ class MainActivity : ComponentActivity() {
 //                    ShapeContainer()
 //                    ButtonsContainer()
 //                    CheckBoxContainer()
-                    MySnackBar()
+//                    MySnackBar()
+                    TextFieldTest()
                 }
             }
         }
+    }
+}
+
+@Composable
+fun TextFieldTest() {
+
+    var userInput by remember { mutableStateOf(TextFieldValue()) }
+    var numberInput by remember { mutableStateOf(TextFieldValue()) }
+    var emailInput by remember { mutableStateOf(TextFieldValue()) }
+    var pwInput by remember { mutableStateOf(TextFieldValue()) }
+
+    var pwShow = remember { mutableStateOf(false) }
+
+    val passwordResource: (Boolean) -> Int = {
+        if (it) R.drawable.baseline_visibility_24 else R.drawable.baseline_visibility_off_24
+    }
+
+    Column(
+        Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) {
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = userInput,
+            singleLine = false,
+            maxLines = 2,
+            onValueChange = { newValue -> userInput = newValue } ,
+            label = { Text(text = "사용자 입력") },
+            placeholder = { Text(text = "작성해 주세요") }
+        )
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = numberInput,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            onValueChange = { newValue -> numberInput = newValue } ,
+            label = { Text(text = "전화번호") },
+            placeholder = { Text(text = "010-xxxx-xxxx") }
+        )
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = emailInput,
+            singleLine = true,
+            leadingIcon = { Icon(imageVector = Icons.Default.Email , contentDescription = null) },
+            trailingIcon = { IconButton(onClick = { /*TODO*/ }) {
+                Icon(imageVector = Icons.Default.CheckCircle , contentDescription = null) }
+                           },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            onValueChange = { newValue -> emailInput = newValue } ,
+            label = { Text(text = "email") },
+            placeholder = { Text(text = "xxx@xxx.xxx") }
+        )
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = pwInput,
+            singleLine = true,
+            leadingIcon = { Icon(imageVector = Icons.Default.Person , contentDescription = null) },
+            trailingIcon = { IconButton(onClick = {
+                Log.d("TAG", "비밀번호 visible 버튼 클릭")
+                pwShow.value = !pwShow.value
+            }) {
+                Icon(painter = painterResource(id = passwordResource(pwShow.value)), null) }
+            },
+            visualTransformation = if (pwShow.value) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            onValueChange = { newValue -> pwInput = newValue } ,
+            label = { Text(text = "pass word") },
+            placeholder = { Text(text = "비밀번호를 입력해주세요") }
+        )
     }
 }
 
@@ -696,6 +779,7 @@ fun DefaultPreview() {
 //        ShapeContainer()
 //        ButtonsContainer()
 //        CheckBoxContainer()
-        MySnackBar()
+//        MySnackBar()
+        TextFieldTest()
     }
 }
