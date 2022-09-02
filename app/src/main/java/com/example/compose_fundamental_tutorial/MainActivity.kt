@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import com.example.compose_fundamental_tutorial.ui.theme.Compose_fundamental_tutorialTheme
+import kotlinx.coroutines.launch
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
@@ -57,10 +58,62 @@ class MainActivity : ComponentActivity() {
 //                    TextContainer()
 //                    ShapeContainer()
 //                    ButtonsContainer()
-                    CheckBoxContainer()
+//                    CheckBoxContainer()
+                    MySnackBar()
                 }
             }
         }
+    }
+}
+
+@Composable
+fun MySnackBar() {
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    val buttonTitle: (SnackbarData?) -> String = { snackbarData ->
+        if (snackbarData != null) "스낵바 숨기기" else "스낵바 보여주기"
+    }
+
+    val buttonColor: (SnackbarData?) -> Color = { snackbarData ->
+        if (snackbarData != null) Color.Green else Color.Red
+    }
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Button(
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = buttonColor(snackbarHostState.currentSnackbarData),
+                contentColor = Color.White
+            ),
+            onClick = {
+            Log.d("TAG", "스낵바 클릭")
+                if(snackbarHostState.currentSnackbarData != null) {
+                    Log.d("TAG", "스낵바 있음")
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    return@Button
+                }
+
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(
+                    "헬로 월드",
+                    "확인",
+                    SnackbarDuration.Short
+                ).let {
+                    when (it) {
+                        SnackbarResult.Dismissed -> Log.d("TAG", "스낵바 닫음")
+                        SnackbarResult.ActionPerformed -> Log.d("TAG", "스낵바 확인 버튼 클릭")
+                    }
+                }
+            }   //coroutineScope
+        }) {
+            Text(text = buttonTitle(snackbarHostState.currentSnackbarData))
+        }
+        // 스낵바가 보여지는 부분
+        SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -607,14 +660,14 @@ fun MyCustomCheckBox(title: String, withRipple: Boolean = false) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-            .size(60.dp)
-            .clickable(
-                indication = rippleEffect,
-                interactionSource = remember{ MutableInteractionSource() }
-            ) {
-                Log.d("TAG", "클릭이 되었습니다.")
-                setisChecked.invoke(!isChecked)
-            }) {
+                .size(60.dp)
+                .clickable(
+                    indication = rippleEffect,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    Log.d("TAG", "클릭이 되었습니다.")
+                    setisChecked.invoke(!isChecked)
+                }) {
             Image(
                 painter = painterResource(id = togglePainter),
                 contentDescription = null,
@@ -642,6 +695,7 @@ fun DefaultPreview() {
 //        TextContainer()
 //        ShapeContainer()
 //        ButtonsContainer()
-        CheckBoxContainer()
+//        CheckBoxContainer()
+        MySnackBar()
     }
 }
